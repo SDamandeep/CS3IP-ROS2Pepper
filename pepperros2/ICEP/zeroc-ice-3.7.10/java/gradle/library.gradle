@@ -1,0 +1,100 @@
+//
+// Copyright (c) ZeroC, Inc. All rights reserved.
+//
+
+jar {
+    if (GradleVersion.current() >= GradleVersion.version('8.0')) {
+        destinationDirectory = new File("${libDir}")
+    } else {
+        destinationDir = new File("${libDir}")
+    }
+}
+
+task jarSources(type:Jar, dependsOn: jar){
+    from sourceSets.main.allSource
+    if (GradleVersion.current() >= GradleVersion.version('8.0')) {
+        archiveClassifier = 'sources'
+        destinationDirectory = new File("${libDir}")
+    } else {
+        classifier = 'sources'
+        destinationDir = new File("${libDir}")
+    }
+}
+
+javadoc.dependsOn(compileSlice)
+
+javadoc {
+    // We rely on Java9+ javadoc features
+    enabled = JavaVersion.current() > JavaVersion.VERSION_1_8
+    doFirst {
+        exclude "**/module-info.java"
+        options.addBooleanOption('html5', true)
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+    failOnError = true
+    options.header = project.ext.displayName
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc
+    if (GradleVersion.current() >= GradleVersion.version('8.0')) {
+        archiveClassifier = 'javadoc'
+        destinationDirectory = new File("${libDir}")
+    } else {
+        classifier = 'javadoc'
+        destinationDir = new File("${libDir}")
+    }
+}
+
+// The maven plugin change in Gradle 7.3, for compatibility with older gradle versions
+// we split maven related tasks to separate files that use the corresponding builtin gradle
+// plug-ins
+project.ext.pomName = "${libDir}/${project.name}-${project.version}.pom"
+if(GradleVersion.current() >= GradleVersion.version('7.3')) {
+    apply from: "$project.ext.topSrcDir/java/gradle/maven-publish.publishing.gradle"
+} else {
+    apply from: "$project.ext.topSrcDir/java/gradle/maven.publishing.gradle"
+}
+
+assemble.dependsOn(jarSources, javadocJar)
+
+artifacts {
+    archives jar, jarSources, javadocJar
+}
+
+jar {
+    manifest {
+        attributes("Class-Path": configurations.runtimeClasspath.resolve().collect{ "${it.name}" }.join(' '))
+    }
+}
+
+if(project.name == "icebox") {
+    jar {
+        manifest {
+            attributes("Main-Class": "com.zeroc.IceBox.Server")
+        }
+    }
+}
+
+if(project.name == "icebox-compat") {
+    jar {
+        manifest {
+            attributes("Main-Class": "IceBox.Server")
+        }
+    }
+}
+
+clean {
+    delete("${libDir}/${project.name}-${project.version}.jar")
+    delete("${libDir}/${project.name}-${project.version}-sources.jar")
+    delete("${libDir}/${project.name}-${project.version}-javadoc.jar")
+    delete(project.ext.pomName)
+}
+
+task installJars(type: Copy, dependsOn: jarSources) {
+    from "${project.ext.pomName}"
+    from "${libDir}/${project.name}-${project.version}.jar"
+    from "${libDir}/${project.name}-${project.version}-sources.jar"
+    into "${DESTDIR}${jarDir}"
+}
+install.dependsOn installJars

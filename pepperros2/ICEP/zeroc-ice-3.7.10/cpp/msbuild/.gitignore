@@ -1,0 +1,8 @@
+# Nuget
+packages/
+AppPackages/
+BundleArtifacts/
+zeroc.ice.v120/*
+zeroc.ice.v140/*
+zeroc.ice.v142/*
+zeroc.ice.v143/*

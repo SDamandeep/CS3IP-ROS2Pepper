@@ -1,0 +1,32 @@
+//
+// Copyright (c) ZeroC, Inc. All rights reserved.
+//
+
+// Don't generate javadoc
+javadoc.enabled = false
+
+sourceSets {
+    main {
+        java {
+            srcDirs "$rootProject.projectDir/test/plugins"
+        }
+    }
+}
+
+dependencies {
+    implementation localDependency('ice')
+}
+
+jar {
+    if (GradleVersion.current() >= GradleVersion.version('8.0')) {
+        archiveFileName = "IceTestPlugins.jar"
+        destinationDirectory = new File("$rootProject.projectDir/lib/")
+    } else {
+        archiveFileName = "IceTestPlugins.jar"
+        destinationDirectory = new File("$rootProject.projectDir/lib/")
+    }
+}
+
+clean {
+    delete("$rootProject.projectDir/lib/IceTestPlugins.jar")
+}
