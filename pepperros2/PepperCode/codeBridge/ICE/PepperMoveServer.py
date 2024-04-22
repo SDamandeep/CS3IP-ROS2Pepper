@@ -29,6 +29,7 @@ def goAhead():
 def manualMove(fwd, sid, angle):
     motion.move(fwd, sid, angle)
 
+#The following code was taken from the NAO documentation and adjusted for this project
 def getImage():
     videoClient = video_service.subscribe("python_client", resolution, colorSpace, 5)
     naoImage = video_service.getImageRemote(videoClient)
@@ -36,20 +37,14 @@ def getImage():
     imageHeight = naoImage[1]
     array = naoImage[6]
     image_string = str(bytearray(array))
-
     # Create a PIL Image from our pixel array.
     im = Image.frombytes("RGB", (imageWidth, imageHeight), image_string)
-
     # Save the image to a file
     image_filename = "LiveFeed.jpg"
     im.save(image_filename)
-
     video_service.unsubscribe(videoClient)
-    # print(type(im))
-    # im.show()
-
     
-    
+#The following code was taken from the NAO documentation and adjusted for this project    
 def leftArm(lspitch, lsroll, lelbowyaw,lelbowroll):
     motion.setStiffnesses("LArm", 1.0)
     names = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll"]
@@ -59,6 +54,7 @@ def leftArm(lspitch, lsroll, lelbowyaw,lelbowroll):
     time.sleep(3.0)
     motion.setStiffnesses("LArm", 0.0)
 
+#The following code was taken from the NAO documentation and adjusted for this project
 def rightArm(rspitch, rsroll, relbowyaw,relbowroll):
     motion.setStiffnesses("RArm", 1.0)
     names = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll"]
