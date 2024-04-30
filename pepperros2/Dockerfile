@@ -102,6 +102,7 @@ WORKDIR /ros2pepper/
 RUN rosdep install -i --from-path src --rosdistro humble -y
 RUN colcon build
 COPY /PepperCode /ros2pepper/src/
+WORKDIR /src/codeBridge/ICE/
 
 # Set up entry point
 CMD ["bash"]
