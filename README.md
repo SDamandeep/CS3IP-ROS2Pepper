@@ -8,6 +8,16 @@ The folder 'pepperros2' contains a docker file which creates a contaioner where 
 
 Link the file: https://community-static.aldebaran.com/resources/2.5.5/naoqi-sdk/naoqi-sdk-2.5.5.5-linux64.tar.gz
 
+Before running the code deactivate the idle movements:
+1. Connect to the robot
+2. Open a new terminal
+3. Type: ssh@nao <robot_ip_address>
+4. Type yes and enter the password
+5. Type: qicli call ALAutonomousLife.setState disabled
+6. Type: qicli call ALMotion.wakeUp
+
+After following the steps above the robot will stop the idle movements
+
 ## Tools used for developemnt
 
 * Ubuntu 22.04
